@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 // This class is just to test the CommandAPI
 
+
 public class ServerInfoCommand {
     private final JavaPlugin plugin;
 

@@ -90,6 +90,17 @@ public class ValidatorManager {
             );
         });
 
+        registerValidator(BoolArg.class, annotation -> {
+            BoolArg boolArg = (BoolArg) annotation;
+            return new BoolArgValidator(
+                    boolArg.name(),
+                    boolArg.description(),
+                    boolArg.required(),
+                    boolArg.trueValues(),
+                    boolArg.falseValues()
+            );
+        });
+
     }
 
     /**

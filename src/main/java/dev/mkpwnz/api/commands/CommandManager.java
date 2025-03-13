@@ -15,17 +15,14 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
- * The CommandManager class is responsible for managing and registering
- * commands, executing them, and handling tab completion for those commands.
- * It integrates with the Bukkit plugin development framework and supports commands
- * with custom validators and annotations for parameter validation.
- * <p>
- * This class implements the {@link CommandExecutor} and {@link TabCompleter}
- * interfaces to provide command execution and tab-completion functionality.
+ * Implements the functionality for managing and executing commands within the Bukkit/Spigot framework.
+ * This class is responsible for registering, validating, and delegating execution of commands.
+ * It acts as the bridge between the plugin's custom commands and the Bukkit/Spigot command system.
  */
 public class CommandManager implements CommandExecutor, TabCompleter {
     private final JavaPlugin plugin;
     private final ValidatorManager validatorManager;
+
 
     private final Map<String, CommandHandler> commands = new HashMap<>();
     private final Map<String, CommandData> commandData = new HashMap<>();
