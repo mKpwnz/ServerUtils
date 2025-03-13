@@ -1,0 +1,13 @@
+name: ServerUtils
+version: '${version}'
+main: dev.mkpwnz.serverUtils.ServerUtils
+api-version: '1.21'
+commands:
+  serverutils:
+    description: Zeigt alle verfügbaren ServerUtils Commands
+    usage: /serverutils
+    aliases: [ sutils ]
+  serverinfo:
+    description: Zeigt Serverinformationen an
+    usage: /serverinfo
+    aliases: [ sinfo ]
