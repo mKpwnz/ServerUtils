@@ -32,7 +32,6 @@ public class CommandHandler {
         Parameter[] parameters = method.getParameters();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-        // Erste Parameter überspringen wenn es CommandSender ist
         int startIndex = parameters[0].getType() == CommandSender.class ? 1 : 0;
 
         for (int i = startIndex; i < parameters.length; i++) {

@@ -48,13 +48,23 @@ processResources {
     }
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def devServerPluginsDir = localProperties.getProperty('minecraft.plugins.dir')
+
 tasks.register("postBuild") {
     doLast {
-        def pluginsDir = new File("${System.getProperty('user.home')}/Developer/minecraft/devserver/plugins")
+        def pluginsDir = new File(devServerPluginsDir)
 
         pluginsDir.listFiles()?.each { file ->
             if (file.name.startsWith("${project.name}-") && file.name.endsWith(".jar")) {
-                println "Lösche alte Version: ${file.name}"
+                println "Delete old plugin Versions: ${file.name}"
                 file.delete()
             }
         }
@@ -63,7 +73,7 @@ tasks.register("postBuild") {
             from "build/libs/${project.name}-${project.version}.jar"
             into pluginsDir
         }
-        println "Neue Version ${project.name}-${project.version}.jar wurde kopiert"
+        println "New Version ${project.name}-${project.version}.jar copied"
     }
 }
 
