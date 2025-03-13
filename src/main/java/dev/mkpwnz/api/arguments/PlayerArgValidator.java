@@ -7,6 +7,11 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A validator for player-related command arguments. This class extends {@code ArgumentValidator}
+ * to provide validation and tab completion functionalities specifically for {@link Player} objects.
+ * It can validate whether a player exists and optionally whether the player is currently online.
+ */
 public class PlayerArgValidator extends ArgumentValidator<Player> {
     private final boolean onlineOnly;
 
