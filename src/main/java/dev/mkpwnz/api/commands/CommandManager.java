@@ -14,6 +14,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
+/**
+ * The CommandManager class is responsible for managing and registering
+ * commands, executing them, and handling tab completion for those commands.
+ * It integrates with the Bukkit plugin development framework and supports commands
+ * with custom validators and annotations for parameter validation.
+ * <p>
+ * This class implements the {@link CommandExecutor} and {@link TabCompleter}
+ * interfaces to provide command execution and tab-completion functionality.
+ */
 public class CommandManager implements CommandExecutor, TabCompleter {
     private final JavaPlugin plugin;
     private final ValidatorManager validatorManager;
@@ -21,11 +30,32 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     private final Map<String, CommandHandler> commands = new HashMap<>();
     private final Map<String, CommandData> commandData = new HashMap<>();
 
+    /**
+     * Constructs a new instance of the CommandManager, responsible for
+     * managing command registrations, argument validation, and command execution.
+     *
+     * @param plugin The JavaPlugin instance associated with this CommandManager.
+     *               This is required for registering commands within the Bukkit/Spigot API.
+     */
     public CommandManager(JavaPlugin plugin) {
         this.plugin = plugin;
         this.validatorManager = ValidatorManager.getInstance();
     }
 
+    /**
+     * Retrieves an {@link ArgumentValidator} suitable for the given method parameter
+     * by analyzing its annotations. This method iterates through all annotations
+     * applied to the parameter and finds the first one that has an associated
+     * validator registered in the {@code validatorManager}.
+     *
+     * @param parameter The {@link Parameter} representing the method parameter for which
+     *                  validation is needed. This object contains metadata about the
+     *                  parameter, including its annotations.
+     *
+     * @return An instance of {@link ArgumentValidator} appropriate for the given
+     * parameter based on its annotations, or {@code null} if no suitable validator
+     * is found.
+     */
     private ArgumentValidator<?> getValidatorForParameter(Parameter parameter) {
         for (Annotation annotation : parameter.getAnnotations()) {
             if (validatorManager.hasValidatorFor(annotation.annotationType())) {
@@ -35,6 +65,16 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         return null;
     }
 
+    /**
+     * Registers a command class and its associated methods annotated with the {@link Command}
+     * annotation to the command system. This method extracts metadata from the annotations
+     * and initializes necessary objects to handle command execution and tab completion.
+     *
+     * @param commandClass The object containing methods annotated with {@link Command}.
+     *                     Methods in this class are processed and registered as executable
+     *                     commands within the command system. The class must include one
+     *                     or more methods with the {@link Command} annotation.
+     */
     public void registerCommand(Object commandClass) {
         for (Method method : commandClass.getClass().getDeclaredMethods()) {
             Command commandAnnotation = method.getAnnotation(Command.class);
@@ -106,11 +146,30 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         }
     }
 
+    /**
+     * Retrieves an immutable map of registered commands and their associated metadata.
+     * The keys in the map are the full names of the commands, and the values are
+     * {@link CommandData} objects containing the command metadata.
+     *
+     * @return A {@code Map<String, CommandData>} representing all registered commands,
+     * where the key is the full name of the command and the value is its associated
+     * metadata. The returned map is immutable and cannot be modified.
+     */
     public Map<String, CommandData> getRegisteredCommands() {
         return Collections.unmodifiableMap(commandData);
     }
 
-
+    /**
+     * Builds the full name of a command by concatenating its parent commands and its own name.
+     * The command name and parent names are converted to lowercase and separated by a period (".").
+     *
+     * @param annotation The {@link Command} annotation containing metadata about the command.
+     *                   This includes the command's name and its parent commands.
+     *
+     * @return A {@code String} representing the fully qualified command name. If the command has
+     * parent commands, they are prefixed to the name and separated by periods. If there are
+     * no parent commands, the command name is returned directly in lowercase.
+     */
     private String buildCommandName(Command annotation) {
         StringBuilder commandName = new StringBuilder();
 
@@ -129,6 +188,25 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         return commandName.toString();
     }
 
+    /**
+     * Executes a command sent by a {@link CommandSender}. This method handles command execution
+     * by resolving the full command name (including subcommands) and delegating to an appropriate
+     * {@link CommandHandler} if a matching command is found.
+     *
+     * @param sender  The {@link CommandSender} who executed the command. This can represent a player,
+     *                the console, or any entity capable of sending commands.
+     * @param command The {@link org.bukkit.command.Command} object representing the base command
+     *                that was executed.
+     * @param label   The exact alias of the command used by the sender. This can assist in identifying
+     *                how the command was called if it has multiple aliases.
+     * @param args    An array of {@code String} containing the arguments passed with the command.
+     *                These arguments are used to determine subcommands or additional parameters
+     *                for the command.
+     *
+     * @return {@code true} if the command was successfully executed and handled by a valid
+     * {@link CommandHandler}; {@code false} otherwise, indicating that no
+     * valid handler was found for the command.
+     */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.Command command, @NotNull String label, String[] args) {
         String baseCommand = command.getName().toLowerCase();
@@ -160,6 +238,22 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         return false;
     }
 
+    /**
+     * Handles tab completion for commands and provides a list of suggestions based on
+     * the current input. This method processes the command structure, matches subcommands,
+     * or delegates tab completion to a specific command handler if applicable.
+     *
+     * @param sender  The {@link CommandSender} who initiated the tab completion. This can be
+     *                a player, the console, or another entity capable of executing commands.
+     * @param command The {@link org.bukkit.command.Command} object representing the base
+     *                command for which tab completion is being performed.
+     * @param alias   The alias of the command that was typed by the {@code sender}.
+     * @param args    An array of {@code String} arguments provided by the {@code sender},
+     *                representing the current state of the input being typed.
+     *
+     * @return A {@code List<String>} containing possible completions based on the current input.
+     * If no suggestions are found, an empty list is returned.
+     */
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.Command command, @NotNull String alias, String[] args) {
         String baseCommand = command.getName().toLowerCase();
